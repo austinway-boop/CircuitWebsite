@@ -261,60 +261,55 @@ def privacy():
 
 @app.route('/game/1')
 def game1():
+    # Allow game access - session will be created if needed
     if 'user_data' not in session:
-        return redirect(url_for('signup'))
+        session['user_data'] = {'name': 'Demo User', 'age': 20, 'location': 'Unknown'}
+        session['session_token'] = secrets.token_urlsafe(16)
+        session['games_completed'] = 0
+        session.permanent = True
     return render_template('game1.html', game_num=1, session_token=session.get('session_token', ''))
 
 
 @app.route('/game/1/complete', methods=['POST'])
 def game1_complete():
-    if 'user_data' not in session:
-        return redirect(url_for('signup'))
     session['games_completed'] = 1
+    session.modified = True
     return redirect(url_for('game2'))
 
 
 @app.route('/game/2')
 def game2():
     if 'user_data' not in session:
-        return redirect(url_for('signup'))
-    if session.get('games_completed', 0) < 1:
         return redirect(url_for('game1'))
     return render_template('game2.html', game_num=2, session_token=session.get('session_token', ''))
 
 
 @app.route('/game/2/complete', methods=['POST'])
 def game2_complete():
-    if 'user_data' not in session:
-        return redirect(url_for('signup'))
     session['games_completed'] = 2
+    session.modified = True
     return redirect(url_for('game3'))
 
 
 @app.route('/game/3')
 def game3():
     if 'user_data' not in session:
-        return redirect(url_for('signup'))
-    if session.get('games_completed', 0) < 2:
-        return redirect(url_for('game2'))
+        return redirect(url_for('game1'))
     return render_template('game3.html', game_num=3, session_token=session.get('session_token', ''))
 
 
 @app.route('/game/3/complete', methods=['POST'])
 def game3_complete():
-    if 'user_data' not in session:
-        return redirect(url_for('signup'))
     session['games_completed'] = 3
+    session.modified = True
     return redirect(url_for('reveal'))
 
 
 @app.route('/reveal')
 def reveal():
     if 'user_data' not in session:
-        return redirect(url_for('signup'))
-    
-    if session.get('games_completed', 0) < 3:
-        return redirect(url_for('game1'))
+        session['user_data'] = {'name': 'Demo User', 'age': 20, 'location': 'Unknown'}
+        session['session_token'] = secrets.token_urlsafe(16)
     
     user_data = session['user_data']
     token_hash = hash_token(session.get('session_token', ''))
