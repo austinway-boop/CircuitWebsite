@@ -263,7 +263,7 @@ def privacy():
 def game1():
     # Allow game access - session will be created if needed
     if 'user_data' not in session:
-        session['user_data'] = {'name': 'Demo User', 'age': 20, 'location': 'Unknown'}
+        session['user_data'] = {'name': 'Demo User', 'first_name': 'Demo', 'age': 20, 'location': 'Unknown'}
         session['session_token'] = secrets.token_urlsafe(16)
         session['games_completed'] = 0
         session.permanent = True
@@ -308,16 +308,17 @@ def game3_complete():
 @app.route('/reveal')
 def reveal():
     if 'user_data' not in session:
-        session['user_data'] = {'name': 'Demo User', 'age': 20, 'location': 'Unknown'}
+        session['user_data'] = {'name': 'Demo User', 'first_name': 'Demo', 'age': 20, 'location': 'Unknown'}
         session['session_token'] = secrets.token_urlsafe(16)
     
     user_data = session['user_data']
     token_hash = hash_token(session.get('session_token', ''))
+    first_name = user_data.get('first_name', user_data.get('name', 'User').split()[0])
     
-    # Wait for prediction
+    # Wait for prediction (max 5 seconds)
     import time
     prediction = None
-    for _ in range(30):
+    for _ in range(10):
         prediction = get_prediction(token_hash)
         if prediction:
             break
@@ -325,15 +326,15 @@ def reveal():
     
     if not prediction:
         prediction = {
-            'college': 'Processing...',
+            'college': 'Demo Mode - No prediction available',
             'career': 'Unknown',
             'personality': 'Unknown',
-            'confidence': 50
+            'confidence': 0
         }
     
     return render_template('reveal.html',
                          prediction=prediction,
-                         user_name=user_data['first_name'],
+                         user_name=first_name,
                          session_token=session.get('session_token', ''))
 
 
