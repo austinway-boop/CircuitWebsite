@@ -9,17 +9,33 @@
     </div>
 
     <div class="predictions fade-in-delay">
-        {% if prediction.college and prediction.found %}
+        {% if prediction.error %}
+        <div class="prediction-card main-prediction error-state">
+            <p class="card-label">something went wrong</p>
+            <p class="card-value">API Error</p>
+            <p class="card-note">{{ prediction.error }}</p>
+        </div>
+        {% elif prediction.college and prediction.found %}
         <div class="prediction-card main-prediction">
             <p class="card-label">we think you may have attended</p>
             <p class="card-value">{{ prediction.college }}</p>
             <p class="card-confidence">{{ prediction.confidence }}% confidence</p>
+            {% if prediction.reasoning %}
+            <p class="card-reasoning">{{ prediction.reasoning }}</p>
+            {% endif %}
+        </div>
+        {% elif prediction.college %}
+        <div class="prediction-card main-prediction low-confidence">
+            <p class="card-label">our best guess</p>
+            <p class="card-value">{{ prediction.college }}</p>
+            <p class="card-confidence">{{ prediction.confidence }}% confidence</p>
+            <p class="card-note">This is an educated guess based on your location and demographics.</p>
         </div>
         {% else %}
         <div class="prediction-card main-prediction no-college">
             <p class="card-label">education</p>
             <p class="card-value">we couldn't determine your college</p>
-            <p class="card-note">Based on your information, we weren't able to make a confident prediction about your educational background.</p>
+            <p class="card-note">We weren't able to make a prediction. Try again or check your info.</p>
         </div>
         {% endif %}
     </div>

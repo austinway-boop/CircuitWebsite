@@ -106,13 +106,28 @@ CRITICAL RULES:
                 result = response.json()
                 logger.info(f"Claude response: {json.dumps(result, indent=2)[:1000]}")
                 return self._parse_claude_response(result, name, age, location)
+            elif response.status_code == 401:
+                logger.error(f"Claude auth error: Invalid API key")
+                return self._error_result("Invalid API key - check ANTHROPIC_API_KEY")
+            elif response.status_code == 429:
+                logger.error(f"Claude rate limit hit")
+                return self._error_result("Rate limit exceeded - try again in a minute")
+            elif response.status_code == 500:
+                logger.error(f"Claude server error: {response.text[:200]}")
+                return self._error_result("AI service temporarily unavailable")
             else:
                 logger.error(f"Claude error: {response.status_code} - {response.text[:500]}")
-                return self._fallback_result(name, age, location)
+                return self._error_result(f"API error (code {response.status_code})")
                 
+        except requests.exceptions.Timeout:
+            logger.error("Claude request timed out")
+            return self._error_result("Request timed out - AI took too long")
+        except requests.exceptions.ConnectionError:
+            logger.error("Could not connect to Claude API")
+            return self._error_result("Could not connect to AI service")
         except Exception as e:
             logger.error(f"Claude exception: {e}", exc_info=True)
-            return self._fallback_result(name, age, location)
+            return self._error_result(f"Unexpected error: {str(e)}")
     
     def _parse_claude_response(self, response: Dict, name: str, age: Optional[int], location: Optional[str]) -> Dict[str, Any]:
         content_blocks = response.get('content', [])
@@ -239,20 +254,40 @@ CRITICAL RULES:
             'raw_response': raw_text
         }
     
-    def _fallback_result(self, name: str, age: Optional[int], location: Optional[str]) -> Dict[str, Any]:
-        """Only used when API completely fails - returns error state."""
+    def _error_result(self, error_msg: str) -> Dict[str, Any]:
+        """Return clear error state when API fails."""
         return {
             'found': False,
-            'college': 'API Error - Could not process request',
+            'college': None,
             'degree': None,
             'field': None,
             'career': None,
             'personality': None,
             'confidence': 0,
             'source': None,
-            'error': 'API request failed',
+            'error': error_msg,
             'raw_response': None
         }
+    
+    def _fallback_result(self, name: str, age: Optional[int], location: Optional[str]) -> Dict[str, Any]:
+        """Fallback when parsing fails but API responded - try location inference."""
+        if location:
+            college = self._infer_college_from_location(location)
+            if college:
+                return {
+                    'found': True,
+                    'college': college,
+                    'degree': "Unknown",
+                    'field': "Unknown",
+                    'career': "Unknown",
+                    'personality': "Unknown",
+                    'confidence': 15,
+                    'source': 'location inference',
+                    'reasoning': f'Inferred from location: {location}',
+                    'raw_response': None
+                }
+        
+        return self._error_result("Could not parse AI response")
 
 
 # Backwards compatibility
