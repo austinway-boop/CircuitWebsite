@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Guidelines - Circuit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='circuitweb/styles/styles.css') }}">
+    <link href="https://api.fontshare.com/v2/css?f[]=sohne@300,400,500,600,700&display=swap" rel="stylesheet">
+</head>
+<body class="secondary-page">
+    <canvas id="gradientCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; pointer-events: none;"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="{{ url_for('circuit_index') }}" style="text-decoration: none; color: inherit;">Circuit</a>
+                </div>
+                <nav class="nav-menu">
+                    <a href="{{ url_for('circuit_how_it_works') }}" class="nav-item"><span>How it Works</span></a>
+                    <a href="{{ url_for('circuit_about') }}" class="nav-item"><span>About</span></a>
+                    <a href="{{ url_for('circuit_research') }}" class="nav-item"><span>Research</span></a>
+                    <a href="{{ url_for('circuit_contact') }}" class="nav-item"><span>Contact</span></a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="{{ url_for('circuit_demo') }}" class="contact-btn">Try Demo</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="secondary-hero">
+            <div class="hero-divider"></div>
+            <h1>Community Guidelines</h1>
+            <p>The standards we all uphold to make Circuit a place for genuine connection.</p>
+        </main>
+    </div>
+
+    <div class="content-section">
+        <div class="container">
+            <div class="page-card" style="max-width: 700px; margin: 0 auto;">
+                <h2>Be Authentic</h2>
+                <ul class="info-list" style="margin-bottom: 32px;">
+                    <li><strong>Use your real identity:</strong> No impersonation or misleading info</li>
+                    <li><strong>One account per person:</strong> Multiple accounts are prohibited</li>
+                    <li><strong>Honest communication:</strong> Don't misrepresent your intentions</li>
+                </ul>
+
+                <h2>Be Respectful</h2>
+                <ul class="info-list" style="margin-bottom: 32px;">
+                    <li><strong>No harassment:</strong> Unwanted contact or intimidation is not tolerated</li>
+                    <li><strong>No hate speech:</strong> Discrimination of any kind is prohibited</li>
+                    <li><strong>Respect boundaries:</strong> Accept "no" gracefully</li>
+                    <li><strong>No unsolicited explicit content</strong></li>
+                </ul>
+
+                <h2>Be Safe</h2>
+                <ul class="info-list" style="margin-bottom: 32px;">
+                    <li><strong>No illegal activity</strong></li>
+                    <li><strong>No commercial activity:</strong> No solicitation or advertising</li>
+                    <li><strong>Protect minors:</strong> Circuit is for adults 18+</li>
+                    <li><strong>No scams:</strong> Financial solicitation results in permanent bans</li>
+                </ul>
+
+                <h2>Enforcement</h2>
+                <div class="highlight-box">
+                    <p><strong>First violation (minor):</strong> Warning</p>
+                    <p><strong>Repeated violations:</strong> Temporary suspension</p>
+                    <p><strong>Serious violations:</strong> Permanent ban</p>
+                    <p><strong>Illegal activity:</strong> Immediate ban + report to authorities</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="{{ url_for('circuit_safety') }}" class="btn-secondary">Learn About Safety</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Circuit</h4>
+                    <p>Building communities, not addictions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_how_it_works') }}">How it Works</a></li>
+                        <li><a href="{{ url_for('circuit_guidelines') }}">Community Guidelines</a></li>
+                        <li><a href="{{ url_for('circuit_safety') }}">Safety</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_about') }}">About</a></li>
+                        <li><a href="{{ url_for('circuit_research') }}">Research</a></li>
+                        <li><a href="{{ url_for('circuit_careers') }}">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_help') }}">Help Center</a></li>
+                        <li><a href="{{ url_for('circuit_contact') }}">Contact</a></li>
+                        <li><a href="{{ url_for('privacy') }}">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>2024 Circuit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='circuitweb/scripts/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.gradientColors = {
+                center: '#f0fdfa',
+                ring1: '#ccfbf1',
+                ring2: '#99f6e4', 
+                outer: '#5eead4'
+            };
+            window.currentCircleColor = '#ffffff';
+        });
+    </script>
+</body>
+</html>

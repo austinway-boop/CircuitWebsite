@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Circuit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='circuitweb/styles/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <style>
+        .about-page-content,
+        .about-page-content h1, .about-page-content h2, .about-page-content h3,
+        .about-page-content h4, .about-page-content p, .about-page-content blockquote,
+        .about-page-content a, .about-page-content span {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        }
+        
+        .about-hero {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 64px 24px 48px;
+        }
+        .about-hero h1 {
+            font-size: 44px;
+            font-weight: 650;
+            color: #0f172a;
+            margin-bottom: 14px;
+            letter-spacing: -0.03em;
+            line-height: 1.08;
+        }
+        .about-hero .lead {
+            font-size: 17px;
+            color: #5a6570;
+            line-height: 1.55;
+        }
+        
+        .about-section { margin-bottom: 14px; }
+        
+        .about-card {
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        /* Video + Intro */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 36px;
+            padding: 32px;
+            align-items: center;
+        }
+        .intro-video {
+            aspect-ratio: 16/10;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #0a0a0a;
+            cursor: pointer;
+            transition: transform 0.18s ease-out;
+        }
+        .intro-video:hover { transform: scale(1.015); }
+        .intro-text h2 {
+            font-size: 28px;
+            font-weight: 640;
+            color: #0f172a;
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+            line-height: 1.18;
+        }
+        .intro-text p {
+            font-size: 15px;
+            color: #5a6570;
+            line-height: 1.65;
+            margin-bottom: 10px;
+        }
+        .intro-text p:last-child { margin-bottom: 0; }
+        
+        /* Mission Banner */
+        .mission-banner {
+            background: #0f172a;
+            padding: 40px 36px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .mission-banner blockquote {
+            font-size: 24px;
+            font-weight: 560;
+            color: #fff;
+            line-height: 1.38;
+            max-width: 640px;
+            margin: 0 auto 14px;
+            letter-spacing: -0.015em;
+        }
+        .mission-banner .subtext {
+            font-size: 15px;
+            color: rgba(255,255,255,0.55);
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        
+        /* Problem Stats */
+        .problem-section {
+            padding: 32px;
+            text-align: center;
+        }
+        .problem-section h2 {
+            font-size: 26px;
+            font-weight: 620;
+            color: #0f172a;
+            margin-bottom: 28px;
+            letter-spacing: -0.02em;
+        }
+        .problem-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 22px 14px;
+            background: rgba(15, 118, 110, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 10px;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: 680;
+            color: #0d9488;
+            margin-bottom: 4px;
+            letter-spacing: -0.025em;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #5a6570;
+            line-height: 1.4;
+        }
+        
+        /* Solution */
+        .solution-section { padding: 32px; }
+        .solution-header {
+            text-align: center;
+            max-width: 520px;
+            margin: 0 auto 28px;
+        }
+        .solution-header h2 {
+            font-size: 26px;
+            font-weight: 620;
+            color: #0f172a;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+        .solution-header p {
+            font-size: 15px;
+            color: #5a6570;
+            line-height: 1.55;
+        }
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .solution-item {
+            padding: 24px;
+            background: rgba(15, 118, 110, 0.025);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        .solution-item h4 {
+            font-size: 16px;
+            font-weight: 620;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+        .solution-item p {
+            font-size: 14px;
+            color: #5a6570;
+            line-height: 1.55;
+            margin: 0;
+        }
+        
+        /* Results */
+        .results-section {
+            padding: 36px;
+            background: rgba(15, 118, 110, 0.03);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .results-section h2 {
+            font-size: 26px;
+            font-weight: 620;
+            color: #0f172a;
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+        }
+        .results-section p {
+            font-size: 15px;
+            color: #5a6570;
+            line-height: 1.6;
+            max-width: 560px;
+            margin: 0 auto 10px;
+        }
+        .metric {
+            display: inline-block;
+            background: rgba(13, 148, 136, 0.1);
+            color: #0d9488;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 650;
+        }
+        
+        /* CTA */
+        .cta-section {
+            padding: 40px 36px;
+            text-align: center;
+            background: #0f172a;
+            border-radius: 12px;
+        }
+        .cta-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+        .cta-section p {
+            font-size: 15px;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 22px;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 13px 26px;
+            background: #0d9488;
+            color: #fff;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 560;
+            text-decoration: none;
+            transition: background 0.14s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-primary:hover {
+            background: #14b8a6;
+        }
+        
+        @media (max-width: 900px) {
+            .about-hero { padding: 44px 20px 36px; }
+            .about-hero h1 { font-size: 32px; }
+            .intro-grid {
+                grid-template-columns: 1fr;
+                gap: 22px;
+                padding: 24px;
+            }
+            .intro-video { max-width: 400px; margin: 0 auto; }
+            .intro-text h2 { font-size: 24px; }
+            .mission-banner { padding: 32px 22px; }
+            .mission-banner blockquote { font-size: 20px; }
+            .problem-section, .solution-section, .results-section { padding: 24px; }
+            .problem-section h2, .solution-header h2, .results-section h2 { font-size: 22px; }
+            .problem-stats, .solution-grid { grid-template-columns: 1fr; gap: 10px; }
+            .stat-number { font-size: 30px; }
+            .cta-section { padding: 32px 22px; }
+            .cta-section h2 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body class="secondary-page">
+    <canvas id="gradientCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; pointer-events: none;"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="{{ url_for('circuit_index') }}" style="text-decoration: none; color: inherit;">
+                        <span class="logo-text">Circuit</span>
+                    </a>
+                </div>
+                <nav class="nav-menu">
+                    <a href="{{ url_for('circuit_how_it_works') }}" class="nav-item"><span>How it Works</span></a>
+                    <a href="{{ url_for('circuit_about') }}" class="nav-item"><span>About</span></a>
+                    <a href="{{ url_for('circuit_research') }}" class="nav-item"><span>Research</span></a>
+                    <a href="{{ url_for('circuit_contact') }}" class="nav-item"><span>Contact</span></a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="{{ url_for('circuit_demo') }}" class="contact-btn">Try Demo</a>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <div class="about-page-content">
+        <div class="about-hero">
+            <h1>About Circuit</h1>
+            <p class="lead">Social matchmaking that solves gaming's retention problem.</p>
+        </div>
+
+        <div class="content-section">
+            <div class="container">
+                
+                <!-- Video + Intro -->
+                <div class="about-card about-section">
+                    <div class="intro-grid">
+                        <div class="intro-video" id="aboutVideoContainer" style="position: relative;">
+                            <video id="aboutVideo" preload="metadata" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                <source src="{{ url_for('static', filename='circuitweb/assets/CircuitExplan.mp4') }}#t=0.5" type="video/mp4">
+                            </video>
+                            <div class="video-overlay-btn" id="aboutVideoOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.1);">
+                                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                                    <circle cx="32" cy="32" r="32" fill="rgba(255, 255, 255, 0.95)"/>
+                                    <path d="M26 20l20 12-20 12V20z" fill="#111"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="intro-text">
+                            <h2>The Core Insight</h2>
+                            <p>Current matchmaking optimizes for skill balance and queue times. But the brain distinguishes between reward-based dopamine and social dopamine.</p>
+                            <p>You build tolerance to reward dopamine in 2-3 weeks. Social dopamine? 6-8 weeks. Players don't quit because they lose interest - they quit because reward loops burn out.</p>
+                            <p>Social loops scale. We're building the infrastructure to make that happen.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mission -->
+                <div class="about-section mission-banner">
+                    <blockquote>Perfectly balanced matches create forgettable relationships. Real friendship forms through shared struggle.</blockquote>
+                    <p class="subtext">The best matchmaking isn't fair - it's intentional. When success depends on others, strangers become allies.</p>
+                </div>
+
+                <!-- Problem Stats -->
+                <div class="about-card about-section">
+                    <div class="problem-section">
+                        <h2>The problem is clear</h2>
+                        <div class="problem-stats">
+                            <div class="stat-card">
+                                <div class="stat-number">90%</div>
+                                <div class="stat-label">of Valorant matches include verbal abuse</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">2-3</div>
+                                <div class="stat-label">weeks to build tolerance to reward dopamine</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">major games optimize for social fit</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solution -->
+                <div class="about-card about-section">
+                    <div class="solution-section">
+                        <div class="solution-header">
+                            <h2>Circuit matches by social compatibility</h2>
+                            <p>Not just skill. We analyze behavioral and emotional data to match players who actually fit together.</p>
+                        </div>
+                        <div class="solution-grid">
+                            <div class="solution-item">
+                                <h4>Social Dopamine Lasts Longer</h4>
+                                <p>Reward tolerance builds in 2-3 weeks. Social dopamine? 6-8 weeks. We extend engagement without burning out players.</p>
+                            </div>
+                            <div class="solution-item">
+                                <h4>Oxytocin Drives Spending</h4>
+                                <p>Social connection releases oxytocin - trust and generosity. Lab studies show it boosts spending up to 33%.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="about-section results-section">
+                    <h2>It works.</h2>
+                    <p>In our experiment with 200,000+ players, we saw a <span class="metric">1-point increase</span> in satisfaction on a 10-point scale.</p>
+                    <p>For Fortnite, that equals roughly <span class="metric">$227 million</span> in annual revenue.</p>
+                </div>
+
+                <!-- CTA -->
+                <div class="about-section cta-section">
+                    <h2>Better retention. Happier players. More revenue.</h2>
+                    <p>Everyone wins.</p>
+                    <a href="{{ url_for('circuit_contact') }}" class="btn-primary">Partner With Us</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Circuit</h4>
+                    <p>Building communities, not addictions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_how_it_works') }}">How it Works</a></li>
+                        <li><a href="{{ url_for('circuit_guidelines') }}">Community Guidelines</a></li>
+                        <li><a href="{{ url_for('circuit_safety') }}">Safety</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_about') }}">About</a></li>
+                        <li><a href="{{ url_for('circuit_research') }}">Research</a></li>
+                        <li><a href="{{ url_for('circuit_careers') }}">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_help') }}">Help Center</a></li>
+                        <li><a href="{{ url_for('circuit_contact') }}">Contact</a></li>
+                        <li><a href="{{ url_for('privacy') }}">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>2024 Circuit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='circuitweb/scripts/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.gradientColors = {
+                center: '#f0fdfa',
+                ring1: '#ccfbf1',
+                ring2: '#99f6e4', 
+                outer: '#5eead4'
+            };
+            window.currentCircleColor = '#ffffff';
+            
+            var video = document.getElementById('aboutVideo');
+            var overlay = document.getElementById('aboutVideoOverlay');
+            
+            if (video && overlay) {
+                overlay.addEventListener('click', function() {
+                    overlay.style.display = 'none';
+                    video.controls = true;
+                    video.play();
+                });
+                video.addEventListener('ended', function() {
+                    overlay.style.display = 'flex';
+                    video.controls = false;
+                });
+                video.addEventListener('pause', function() {
+                    if (video.currentTime > 0 && !video.ended) return;
+                    overlay.style.display = 'flex';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

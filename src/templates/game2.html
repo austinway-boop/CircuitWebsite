@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}black magic{% endblock %}
+
+{% block content %}
+<div class="game-wrapper">
+    <div class="game-progress">
+        <div class="progress-dot completed"></div>
+        <div class="progress-line completed"></div>
+        <div class="progress-dot active"></div>
+        <div class="progress-line"></div>
+        <div class="progress-dot"></div>
+    </div>
+
+    <div class="game-header fade-in">
+        <p class="game-label">game 2 of 3</p>
+        <h2>reaction time</h2>
+        <p class="game-desc">wait for green, then click as fast as you can</p>
+    </div>
+
+    <div class="reaction-container fade-in-delay">
+        <div class="reaction-box" id="reactionBox">
+            <span class="reaction-text" id="reactionText">click to start</span>
+        </div>
+        
+        <div class="reaction-stats">
+            <div class="stat">
+                <span class="stat-value" id="roundNum">0/5</span>
+                <span class="stat-label">round</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="bestTime">-</span>
+                <span class="stat-label">best</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="avgTime">-</span>
+                <span class="stat-label">average</span>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+</div>
+
+<form id="completeForm" method="POST" action="{{ url_for('game2_complete') }}" style="display:none;">
+    <input type="hidden" name="token" value="{{ session_token }}">
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    const TOTAL_ROUNDS = 5;
+    
+    const box = document.getElementById('reactionBox');
+    const text = document.getElementById('reactionText');
+    const roundEl = document.getElementById('roundNum');
+    const bestEl = document.getElementById('bestTime');
+    const avgEl = document.getElementById('avgTime');
+    const progressEl = document.getElementById('progressFill');
+    
+    let round = 0;
+    let times = [];
+    let state = 'idle'; // idle, waiting, ready, result
+    let startTime = 0;
+    let timeout = null;
+    
+    function updateStats() {
+        if (times.length > 0) {
+            const best = Math.min(...times);
+            const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+            bestEl.textContent = best + 'ms';
+            avgEl.textContent = avg + 'ms';
+        }
+        roundEl.textContent = round + '/' + TOTAL_ROUNDS;
+        progressEl.style.width = (round / TOTAL_ROUNDS * 100) + '%';
+    }
+    
+    function startWaiting() {
+        state = 'waiting';
+        box.className = 'reaction-box waiting';
+        text.textContent = 'wait for green...';
+        
+        // Random delay between 1.5 and 4 seconds
+        // Gets slightly faster in later rounds
+        const minDelay = Math.max(1000, 1500 - (round * 100));
+        const maxDelay = Math.max(2500, 4000 - (round * 200));
+        const delay = minDelay + Math.random() * (maxDelay - minDelay);
+        
+        timeout = setTimeout(() => {
+            state = 'ready';
+            box.className = 'reaction-box ready';
+            text.textContent = 'CLICK!';
+            startTime = performance.now();
+        }, delay);
+    }
+    
+    function recordTime() {
+        const time = Math.round(performance.now() - startTime);
+        times.push(time);
+        round++;
+        
+        state = 'result';
+        box.className = 'reaction-box result';
+        text.textContent = time + ' ms';
+        
+        updateStats();
+        
+        if (round >= TOTAL_ROUNDS) {
+            setTimeout(complete, 1200);
+        } else {
+            setTimeout(() => {
+                box.className = 'reaction-box idle';
+                text.textContent = 'click to continue';
+                state = 'idle';
+            }, 1200);
+        }
+    }
+    
+    function tooEarly() {
+        clearTimeout(timeout);
+        state = 'result';
+        box.className = 'reaction-box early';
+        text.textContent = 'too early!';
+        
+        setTimeout(() => {
+            box.className = 'reaction-box idle';
+            text.textContent = 'click to try again';
+            state = 'idle';
+        }, 1200);
+    }
+    
+    function complete() {
+        box.className = 'reaction-box result';
+        text.textContent = 'complete!';
+        progressEl.style.width = '100%';
+        
+        setTimeout(() => document.getElementById('completeForm').submit(), 800);
+    }
+    
+    box.addEventListener('click', () => {
+        if (state === 'idle') {
+            startWaiting();
+        } else if (state === 'waiting') {
+            tooEarly();
+        } else if (state === 'ready') {
+            recordTime();
+        }
+    });
+    
+    // Prevent accidental double-clicks
+    box.addEventListener('dblclick', (e) => e.preventDefault());
+})();
+</script>
+{% endblock %}

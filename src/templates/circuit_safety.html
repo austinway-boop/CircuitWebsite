@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety - Circuit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='circuitweb/styles/styles.css') }}">
+    <link href="https://api.fontshare.com/v2/css?f[]=sohne@300,400,500,600,700&display=swap" rel="stylesheet">
+</head>
+<body class="secondary-page">
+    <canvas id="gradientCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; pointer-events: none;"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="{{ url_for('circuit_index') }}" style="text-decoration: none; color: inherit;">Circuit</a>
+                </div>
+                <nav class="nav-menu">
+                    <a href="{{ url_for('circuit_how_it_works') }}" class="nav-item"><span>How it Works</span></a>
+                    <a href="{{ url_for('circuit_about') }}" class="nav-item"><span>About</span></a>
+                    <a href="{{ url_for('circuit_research') }}" class="nav-item"><span>Research</span></a>
+                    <a href="{{ url_for('circuit_contact') }}" class="nav-item"><span>Contact</span></a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="{{ url_for('circuit_demo') }}" class="contact-btn">Try Demo</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="secondary-hero">
+            <div class="hero-divider"></div>
+            <h1>Safety at Circuit</h1>
+            <p>Your safety is our priority. Here's how we protect our community.</p>
+        </main>
+    </div>
+
+    <div class="content-section">
+        <div class="container">
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <h4>Identity Verification</h4>
+                    <p>All users go through verification. No bots, no catfish, no fake accounts.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Voice Authentication</h4>
+                    <p>Voice intros confirm real humans. We detect AI-generated audio.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>24/7 Moderation</h4>
+                    <p>Trained moderators review reports around the clock.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Privacy by Design</h4>
+                    <p>Minimal data collection. Your info is never sold.</p>
+                </div>
+            </div>
+
+            <div class="page-card" style="max-width: 700px; margin: 0 auto;">
+                <h2>Safety Features</h2>
+                
+                <h3 style="margin-top: 24px;">Before Meeting</h3>
+                <ul class="info-list" style="margin-bottom: 24px;">
+                    <li>Profile verification badges</li>
+                    <li>Voice-only chat before sharing photos</li>
+                    <li>Mutual interest matching required</li>
+                </ul>
+
+                <h3>During Interactions</h3>
+                <ul class="info-list" style="margin-bottom: 32px;">
+                    <li>Easy one-tap blocking</li>
+                    <li>Detailed report system</li>
+                    <li>AI-powered harassment detection</li>
+                </ul>
+
+                <h2>Reporting Concerns</h2>
+                <p style="margin-bottom: 16px;">If you experience harassment or feel unsafe:</p>
+                <ul class="info-list" style="margin-bottom: 32px;">
+                    <li>Use the in-app report button</li>
+                    <li>Email <strong style="color: var(--brand-primary);">safety@circuit.app</strong></li>
+                    <li>For emergencies, contact local authorities</li>
+                </ul>
+
+                <div style="text-align: center;">
+                    <a href="{{ url_for('circuit_guidelines') }}" class="btn-secondary">Read Community Guidelines</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Circuit</h4>
+                    <p>Building communities, not addictions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_how_it_works') }}">How it Works</a></li>
+                        <li><a href="{{ url_for('circuit_guidelines') }}">Community Guidelines</a></li>
+                        <li><a href="{{ url_for('circuit_safety') }}">Safety</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_about') }}">About</a></li>
+                        <li><a href="{{ url_for('circuit_research') }}">Research</a></li>
+                        <li><a href="{{ url_for('circuit_careers') }}">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_help') }}">Help Center</a></li>
+                        <li><a href="{{ url_for('circuit_contact') }}">Contact</a></li>
+                        <li><a href="{{ url_for('privacy') }}">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>2024 Circuit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='circuitweb/scripts/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.gradientColors = {
+                center: '#f0fdfa',
+                ring1: '#ccfbf1',
+                ring2: '#99f6e4', 
+                outer: '#5eead4'
+            };
+            window.currentCircleColor = '#ffffff';
+        });
+    </script>
+</body>
+</html>

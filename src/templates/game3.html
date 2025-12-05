@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}black magic{% endblock %}
+
+{% block content %}
+<div class="game-wrapper">
+    <div class="game-progress">
+        <div class="progress-dot completed"></div>
+        <div class="progress-line completed"></div>
+        <div class="progress-dot completed"></div>
+        <div class="progress-line completed"></div>
+        <div class="progress-dot active"></div>
+    </div>
+
+    <div class="game-header fade-in">
+        <p class="game-label">game 3 of 3</p>
+        <h2>pattern memory</h2>
+        <p class="game-desc" id="instruction">watch the sequence, then repeat it</p>
+    </div>
+
+    <div class="sequence-container fade-in-delay">
+        <div class="sequence-grid" id="sequenceGrid">
+            <div class="seq-cell" data-id="0"></div>
+            <div class="seq-cell" data-id="1"></div>
+            <div class="seq-cell" data-id="2"></div>
+            <div class="seq-cell" data-id="3"></div>
+            <div class="seq-cell" data-id="4"></div>
+            <div class="seq-cell" data-id="5"></div>
+            <div class="seq-cell" data-id="6"></div>
+            <div class="seq-cell" data-id="7"></div>
+            <div class="seq-cell" data-id="8"></div>
+        </div>
+        
+        <div class="sequence-stats">
+            <div class="stat">
+                <span class="stat-value" id="level">1</span>
+                <span class="stat-label">level</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="seqLength">3</span>
+                <span class="stat-label">sequence</span>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+</div>
+
+<form id="completeForm" method="POST" action="{{ url_for('game3_complete') }}" style="display:none;">
+    <input type="hidden" name="token" value="{{ session_token }}">
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    const MAX_LEVEL = 5;
+    const cells = document.querySelectorAll('.seq-cell');
+    const grid = document.getElementById('sequenceGrid');
+    const instruction = document.getElementById('instruction');
+    const levelEl = document.getElementById('level');
+    const seqLengthEl = document.getElementById('seqLength');
+    const progressEl = document.getElementById('progressFill');
+    
+    let level = 1;
+    let sequence = [];
+    let playerIndex = 0;
+    let isShowingSequence = false;
+    let canInput = false;
+    
+    function getSequenceLength() {
+        // Starts at 3, increases each level
+        return level + 2;
+    }
+    
+    function getShowSpeed() {
+        // Gets faster each level (600ms down to 350ms)
+        return Math.max(350, 600 - (level * 50));
+    }
+    
+    function generateSequence() {
+        const len = getSequenceLength();
+        sequence = [];
+        for (let i = 0; i < len; i++) {
+            sequence.push(Math.floor(Math.random() * 9));
+        }
+        seqLengthEl.textContent = len;
+    }
+    
+    function showSequence() {
+        isShowingSequence = true;
+        canInput = false;
+        instruction.textContent = 'watch the sequence';
+        grid.classList.add('disabled');
+        
+        let i = 0;
+        const speed = getShowSpeed();
+        
+        function showNext() {
+            // Clear previous
+            cells.forEach(c => c.classList.remove('lit'));
+            
+            if (i < sequence.length) {
+                // Show current
+                cells[sequence[i]].classList.add('lit');
+                i++;
+                setTimeout(showNext, speed);
+            } else {
+                // Done showing
+                setTimeout(() => {
+                    cells.forEach(c => c.classList.remove('lit'));
+                    isShowingSequence = false;
+                    canInput = true;
+                    playerIndex = 0;
+                    instruction.textContent = 'your turn - repeat the sequence';
+                    grid.classList.remove('disabled');
+                }, speed);
+            }
+        }
+        
+        setTimeout(showNext, 500);
+    }
+    
+    function handleClick(cellIndex) {
+        if (!canInput || isShowingSequence) return;
+        
+        const cell = cells[cellIndex];
+        cell.classList.add('pressed');
+        setTimeout(() => cell.classList.remove('pressed'), 150);
+        
+        if (cellIndex === sequence[playerIndex]) {
+            // Correct
+            playerIndex++;
+            
+            if (playerIndex === sequence.length) {
+                // Level complete!
+                canInput = false;
+                instruction.textContent = 'correct!';
+                
+                level++;
+                levelEl.textContent = Math.min(level, MAX_LEVEL);
+                progressEl.style.width = ((level - 1) / MAX_LEVEL * 100) + '%';
+                
+                if (level > MAX_LEVEL) {
+                    complete();
+                } else {
+                    setTimeout(() => {
+                        generateSequence();
+                        showSequence();
+                    }, 1000);
+                }
+            }
+        } else {
+            // Wrong
+            canInput = false;
+            cell.classList.add('wrong');
+            instruction.textContent = 'wrong - watch again';
+            
+            setTimeout(() => {
+                cell.classList.remove('wrong');
+                playerIndex = 0;
+                showSequence();
+            }, 1200);
+        }
+    }
+    
+    function complete() {
+        instruction.textContent = 'complete!';
+        progressEl.style.width = '100%';
+        
+        setTimeout(() => document.getElementById('completeForm').submit(), 800);
+    }
+    
+    // Click handlers
+    cells.forEach((cell, idx) => {
+        cell.addEventListener('click', () => handleClick(idx));
+    });
+    
+    // Start
+    setTimeout(() => {
+        generateSequence();
+        showSequence();
+    }, 1200);
+})();
+</script>
+{% endblock %}

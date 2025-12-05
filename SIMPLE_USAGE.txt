@@ -1,0 +1,18 @@
+SUPER SIMPLE USAGE
+==================
+
+1. Run: ./START.sh
+
+2. Open: http://localhost:2404
+
+3. Search:
+   - Name: [person's name]
+   - Age: [their age]
+   - Location: [optional]
+
+4. Get their LinkedIn profile link
+
+No login. No OAuth. Just search.
+
+Your API credentials should be set in .env file.
+See docs/USAGE.md for setup instructions.

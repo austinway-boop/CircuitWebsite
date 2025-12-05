@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}black magic - complete{% endblock %}
+
+{% block content %}
+<div class="success-overlay">
+    <div id="boxContainer"></div>
+    <div class="success-content visible">
+        <h2>thank you</h2>
+        <p class="demo-message">
+            This was a demo, so we may have gotten it wrong. But if you're interested in seeing how we use the Circuit algorithm to identify behavioral patterns from player data in video games, we'd love to hear from you.
+        </p>
+        <div class="complete-buttons">
+            <a href="mailto:contact@circuit.com" class="btn contact-btn">get in touch</a>
+            <a href="{{ url_for('circuit_index') }}" class="btn home-btn">return home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('boxContainer');
+    const boxes = [];
+    const numBoxes = 50;
+    const gravity = 0.3;
+    const bounce = 0.5;
+    const friction = 0.99;
+    const groundY = window.innerHeight - 20;
+    
+    for (let i = 0; i < numBoxes; i++) {
+        const size = Math.random() * 25 + 12;
+        const box = document.createElement('div');
+        box.className = 'physics-box';
+        box.style.width = size + 'px';
+        box.style.height = size + 'px';
+        container.appendChild(box);
+        
+        boxes.push({
+            el: box,
+            x: Math.random() * (window.innerWidth - size),
+            y: groundY - size - Math.random() * 100,
+            vx: 0,
+            vy: 0,
+            size: size,
+            rotation: Math.random() * 360,
+            rotationSpeed: 0,
+            isDragging: false
+        });
+        
+        box.addEventListener('mousedown', (e) => startDrag(e, boxes[i]));
+        box.addEventListener('touchstart', (e) => startDrag(e, boxes[i]));
+    }
+    
+    let draggedBox = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    
+    function startDrag(e, box) {
+        e.preventDefault();
+        draggedBox = box;
+        box.isDragging = true;
+        box.el.style.zIndex = 100;
+        
+        const pos = e.touches ? e.touches[0] : e;
+        dragOffsetX = pos.clientX - box.x;
+        dragOffsetY = pos.clientY - box.y;
+        lastMouseX = pos.clientX;
+        lastMouseY = pos.clientY;
+    }
+    
+    function onMove(e) {
+        if (!draggedBox) return;
+        const pos = e.touches ? e.touches[0] : e;
+        
+        draggedBox.vx = (pos.clientX - lastMouseX) * 0.5;
+        draggedBox.vy = (pos.clientY - lastMouseY) * 0.5;
+        
+        draggedBox.x = pos.clientX - dragOffsetX;
+        draggedBox.y = pos.clientY - dragOffsetY;
+        
+        lastMouseX = pos.clientX;
+        lastMouseY = pos.clientY;
+    }
+    
+    function onUp() {
+        if (draggedBox) {
+            draggedBox.isDragging = false;
+            draggedBox.el.style.zIndex = 1;
+            draggedBox = null;
+        }
+    }
+    
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove);
+    document.addEventListener('touchend', onUp);
+    
+    function update() {
+        boxes.forEach(box => {
+            if (box.isDragging) {
+                box.el.style.transform = `translate(${box.x}px, ${box.y}px) rotate(${box.rotation}deg)`;
+                return;
+            }
+            
+            box.vy += gravity;
+            box.vx *= friction;
+            
+            box.x += box.vx;
+            box.y += box.vy;
+            box.rotation += box.rotationSpeed;
+            
+            if (box.y + box.size > groundY) {
+                box.y = groundY - box.size;
+                box.vy *= -bounce;
+                box.rotationSpeed *= 0.8;
+                
+                if (Math.abs(box.vy) < 1) {
+                    box.vy = 0;
+                    box.rotationSpeed *= 0.9;
+                }
+            }
+            
+            if (box.x < 0) {
+                box.x = 0;
+                box.vx *= -bounce;
+            }
+            if (box.x + box.size > window.innerWidth) {
+                box.x = window.innerWidth - box.size;
+                box.vx *= -bounce;
+            }
+            
+            box.el.style.transform = `translate(${box.x}px, ${box.y}px) rotate(${box.rotation}deg)`;
+        });
+        
+        requestAnimationFrame(update);
+    }
+    
+    update();
+});
+</script>
+{% endblock %}

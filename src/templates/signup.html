@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}black magic - create account{% endblock %}
+
+{% block content %}
+<div class="signup-wrapper fade-in">
+    <div class="signup-header">
+        <h1>create account</h1>
+        <p class="subtitle">join the demo experience</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('signup') }}" id="signupForm" class="signup-form">
+        <div class="form-group">
+            <label for="firstName">first name</label>
+            <input 
+                type="text" 
+                id="firstName" 
+                name="first_name" 
+                required
+                autocomplete="given-name"
+                minlength="1"
+                maxlength="50"
+                placeholder="John"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="lastName">last name</label>
+            <input 
+                type="text" 
+                id="lastName" 
+                name="last_name" 
+                required
+                autocomplete="family-name"
+                minlength="1"
+                maxlength="50"
+                placeholder="Smith"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="dob">date of birth</label>
+            <input 
+                type="date" 
+                id="dob" 
+                name="dob" 
+                required
+                max=""
+            >
+            <span class="form-hint">you must be at least 18 years old</span>
+        </div>
+
+        <div class="form-group">
+            <label>location</label>
+            <div class="location-box" id="locationBox">
+                <span class="status-indicator" id="statusDot"></span>
+                <span id="locationText">detecting location...</span>
+            </div>
+            <input type="hidden" name="location" id="locationInput">
+            <input type="hidden" name="location_method" id="locationMethod" value="ip">
+            
+            <div id="manualLocationWrapper" class="hidden">
+                <div class="vpn-notice">
+                    We couldn't detect your location automatically. Please enter it manually.
+                </div>
+                <input 
+                    type="text" 
+                    id="manualLocation" 
+                    placeholder="City, State/Country"
+                >
+                <span class="form-hint">e.g., San Francisco, CA or London, UK</span>
+            </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="termsCheckbox" name="agree_terms" required>
+                <span class="checkbox-text">
+                    I agree to the <a href="{{ url_for('terms') }}" target="_blank">Terms of Service</a> and <a href="{{ url_for('privacy') }}" target="_blank">Privacy Policy</a>
+                </span>
+            </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="ageCheckbox" name="confirm_age" required>
+                <span class="checkbox-text">
+                    I confirm that I am at least 18 years of age
+                </span>
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-full" id="submitBtn" disabled>
+            create account
+        </button>
+        
+        <p class="form-footer">
+            By creating an account, you acknowledge that this is a demonstration product and results are for entertainment purposes only.
+        </p>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    const locationBox = document.getElementById('locationBox');
+    const statusDot = document.getElementById('statusDot');
+    const locationText = document.getElementById('locationText');
+    const locationInput = document.getElementById('locationInput');
+    const locationMethod = document.getElementById('locationMethod');
+    const manualWrapper = document.getElementById('manualLocationWrapper');
+    const manualLocation = document.getElementById('manualLocation');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('signupForm');
+    const dobInput = document.getElementById('dob');
+    
+    // Set max date to 18 years ago
+    const today = new Date();
+    const minAge = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    const maxDate = minAge.toISOString().split('T')[0];
+    dobInput.setAttribute('max', maxDate);
+    
+    // Set min date to 120 years ago
+    const maxAge = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
+    dobInput.setAttribute('min', maxAge.toISOString().split('T')[0]);
+
+    async function detectLocation() {
+        try {
+            const response = await fetch('http://ip-api.com/json/?fields=status,country,regionName,city,proxy,hosting');
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                if (data.proxy || data.hosting) {
+                    showManualInput();
+                    return;
+                }
+
+                const location = `${data.city}, ${data.regionName}, ${data.country}`;
+                locationInput.value = location;
+                locationText.textContent = location;
+                statusDot.classList.add('active');
+                locationBox.classList.add('detected');
+                checkFormValidity();
+            } else {
+                showManualInput();
+            }
+        } catch (error) {
+            showManualInput();
+        }
+    }
+
+    function showManualInput() {
+        locationText.textContent = 'manual entry required';
+        statusDot.classList.add('warning');
+        locationBox.classList.add('warning');
+        manualWrapper.classList.remove('hidden');
+        locationMethod.value = 'manual';
+
+        manualLocation.addEventListener('input', function() {
+            if (this.value.trim().length >= 3) {
+                locationInput.value = this.value.trim();
+            } else {
+                locationInput.value = '';
+            }
+            checkFormValidity();
+        });
+    }
+
+    function checkFormValidity() {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const dob = document.getElementById('dob').value;
+        const hasLocation = locationInput.value.trim().length > 0;
+        const termsChecked = document.getElementById('termsCheckbox').checked;
+        const ageChecked = document.getElementById('ageCheckbox').checked;
+
+        const isValid = firstName.length >= 1 && 
+                       lastName.length >= 1 && 
+                       dob && 
+                       hasLocation && 
+                       termsChecked && 
+                       ageChecked;
+        
+        submitBtn.disabled = !isValid;
+    }
+
+    // Listen for all form changes
+    document.getElementById('firstName').addEventListener('input', checkFormValidity);
+    document.getElementById('lastName').addEventListener('input', checkFormValidity);
+    document.getElementById('dob').addEventListener('input', checkFormValidity);
+    document.getElementById('termsCheckbox').addEventListener('change', checkFormValidity);
+    document.getElementById('ageCheckbox').addEventListener('change', checkFormValidity);
+
+    detectLocation();
+})();
+</script>
+{% endblock %}

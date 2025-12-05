@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Circuit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='circuitweb/styles/styles.css') }}">
+    <link href="https://api.fontshare.com/v2/css?f[]=sohne@300,400,500,600,700&display=swap" rel="stylesheet">
+</head>
+<body class="secondary-page">
+    <canvas id="gradientCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; pointer-events: none;"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="{{ url_for('circuit_index') }}" style="text-decoration: none; color: inherit;">Circuit</a>
+                </div>
+                <nav class="nav-menu">
+                    <a href="{{ url_for('circuit_how_it_works') }}" class="nav-item"><span>How it Works</span></a>
+                    <a href="{{ url_for('circuit_about') }}" class="nav-item"><span>About</span></a>
+                    <a href="{{ url_for('circuit_research') }}" class="nav-item"><span>Research</span></a>
+                    <a href="{{ url_for('circuit_contact') }}" class="nav-item"><span>Contact</span></a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="{{ url_for('circuit_demo') }}" class="contact-btn">Try Demo</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="secondary-hero">
+            <div class="hero-divider"></div>
+            <h1>Privacy Policy</h1>
+            <p>Last Updated: December 2, 2024</p>
+        </main>
+    </div>
+
+    <div class="content-section">
+        <div class="container">
+            <div class="page-card" style="max-width: 800px; margin: 0 auto;">
+                <h2>1. Introduction</h2>
+                <p style="margin-bottom: 24px;">Circuit ("we," "us," or "our") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our demonstration service ("Service").</p>
+
+                <h2>2. Information We Collect</h2>
+                <h3 style="margin-top: 16px;">2.1 Information You Provide</h3>
+                <p style="margin-bottom: 12px;">When you use our Service, you voluntarily provide:</p>
+                <ul class="info-list" style="margin-bottom: 20px;">
+                    <li><strong>Name:</strong> First and last name for identification purposes</li>
+                    <li><strong>Date of Birth:</strong> To verify age eligibility and for demonstration purposes</li>
+                    <li><strong>Location:</strong> City, state/region, and country information</li>
+                </ul>
+                
+                <h3>2.2 Information Collected Automatically</h3>
+                <p style="margin-bottom: 12px;">We may automatically collect:</p>
+                <ul class="info-list" style="margin-bottom: 24px;">
+                    <li><strong>IP Address:</strong> For location detection and security purposes</li>
+                    <li><strong>Device Information:</strong> Browser type, operating system</li>
+                    <li><strong>Usage Data:</strong> Interaction with the Service, timestamps</li>
+                    <li><strong>Cookies:</strong> Session management and preferences</li>
+                </ul>
+
+                <h2>3. How We Use Your Information</h2>
+                <p style="margin-bottom: 12px;">We use the information we collect to:</p>
+                <ul class="info-list" style="margin-bottom: 24px;">
+                    <li>Provide and operate the demonstration Service</li>
+                    <li>Generate predictions and analyses for entertainment purposes</li>
+                    <li>Verify your eligibility to use the Service</li>
+                    <li>Improve and optimize the Service</li>
+                    <li>Detect and prevent fraud or abuse</li>
+                    <li>Comply with legal obligations</li>
+                </ul>
+
+                <h2>4. Data Sharing and Disclosure</h2>
+                <p style="margin-bottom: 12px;">We do not sell your personal information. We may share your information only in the following circumstances:</p>
+                <ul class="info-list" style="margin-bottom: 24px;">
+                    <li><strong>Service Providers:</strong> Third-party services that assist in operating our Service</li>
+                    <li><strong>Legal Requirements:</strong> When required by law, subpoena, or legal process</li>
+                    <li><strong>Protection of Rights:</strong> To protect our rights, privacy, safety, or property</li>
+                    <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+                </ul>
+
+                <h2>5. Data Retention</h2>
+                <p style="margin-bottom: 24px;">We retain your personal data only for as long as necessary to fulfill the purposes outlined in this Privacy Policy. Session data is typically retained for 24 hours. We may retain certain information longer if required by law or for legitimate business purposes.</p>
+
+                <h2>6. Data Security</h2>
+                <p style="margin-bottom: 24px;">We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet or electronic storage is 100% secure, and we cannot guarantee absolute security.</p>
+
+                <h2>7. Your Rights</h2>
+                <p style="margin-bottom: 12px;">Depending on your location, you may have the following rights:</p>
+                <ul class="info-list" style="margin-bottom: 24px;">
+                    <li><strong>Access:</strong> Request access to your personal data</li>
+                    <li><strong>Correction:</strong> Request correction of inaccurate data</li>
+                    <li><strong>Deletion:</strong> Request deletion of your data</li>
+                    <li><strong>Portability:</strong> Request a copy of your data in a portable format</li>
+                    <li><strong>Objection:</strong> Object to certain processing of your data</li>
+                    <li><strong>Withdrawal:</strong> Withdraw consent where processing is based on consent</li>
+                </ul>
+
+                <h2>8. Children's Privacy</h2>
+                <p style="margin-bottom: 24px;">Our Service is not intended for individuals under 18 years of age. We do not knowingly collect personal information from children under 18. If we become aware that we have collected data from a child under 18, we will take steps to delete such information.</p>
+
+                <h2>9. Changes to This Policy</h2>
+                <p style="margin-bottom: 24px;">We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last Updated" date. Your continued use of the Service after changes constitutes acceptance of the updated policy.</p>
+
+                <h2>10. Contact Us</h2>
+                <p style="margin-bottom: 24px;">If you have questions or concerns about this Privacy Policy or our data practices, please contact us at <strong style="color: var(--brand-primary);">privacy@circuit.app</strong></p>
+
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="{{ url_for('circuit_index') }}" class="btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Circuit</h4>
+                    <p>Building communities, not addictions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_how_it_works') }}">How it Works</a></li>
+                        <li><a href="{{ url_for('circuit_guidelines') }}">Community Guidelines</a></li>
+                        <li><a href="{{ url_for('circuit_safety') }}">Safety</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_about') }}">About</a></li>
+                        <li><a href="{{ url_for('circuit_research') }}">Research</a></li>
+                        <li><a href="{{ url_for('circuit_careers') }}">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_help') }}">Help Center</a></li>
+                        <li><a href="{{ url_for('circuit_contact') }}">Contact</a></li>
+                        <li><a href="{{ url_for('privacy') }}">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>2024 Circuit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='circuitweb/scripts/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.gradientColors = {
+                center: '#f0fdfa',
+                ring1: '#ccfbf1',
+                ring2: '#99f6e4', 
+                outer: '#5eead4'
+            };
+            window.currentCircleColor = '#ffffff';
+        });
+    </script>
+</body>
+</html>

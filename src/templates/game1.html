@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}black magic{% endblock %}
+
+{% block content %}
+<div class="game-wrapper">
+    <div class="game-progress">
+        <div class="progress-dot active"></div>
+        <div class="progress-line"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-line"></div>
+        <div class="progress-dot"></div>
+    </div>
+
+    <div class="game-header fade-in">
+        <p class="game-label">game 1 of 3</p>
+        <h2>memory recall</h2>
+        <p class="game-desc">remember the word, then type it</p>
+    </div>
+
+    <div class="memory-recall-container fade-in-delay">
+        <div class="word-flash-box" id="flashBox">
+            <span class="flash-word" id="flashWord">get ready</span>
+        </div>
+        
+        <div class="recall-input-area hidden" id="inputArea">
+            <input 
+                type="text" 
+                class="recall-input" 
+                id="recallInput" 
+                autocomplete="off"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                placeholder="type the word..."
+            >
+            <p class="recall-hint" id="recallHint"></p>
+        </div>
+        
+        <div class="recall-stats">
+            <div class="stat">
+                <span class="stat-value" id="round">1</span>
+                <span class="stat-label">round</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="correct">0</span>
+                <span class="stat-label">correct</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="difficulty">easy</span>
+                <span class="stat-label">level</span>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+</div>
+
+<form id="completeForm" method="POST" action="{{ url_for('game1_complete') }}" style="display:none;">
+    <input type="hidden" name="token" value="{{ session_token }}">
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    // Words grouped by difficulty (length)
+    const easyWords = ['code', 'data', 'link', 'node', 'sync', 'byte', 'loop', 'file'];
+    const medWords = ['server', 'python', 'neural', 'matrix', 'binary', 'system', 'module', 'vector'];
+    const hardWords = ['algorithm', 'framework', 'interface', 'prototype', 'recursive', 'synthesis', 'bandwidth', 'encrypted'];
+    
+    const TOTAL_ROUNDS = 10;
+    let round = 0;
+    let correctCount = 0;
+    let currentWord = '';
+    
+    const flashBox = document.getElementById('flashBox');
+    const flashWord = document.getElementById('flashWord');
+    const inputArea = document.getElementById('inputArea');
+    const recallInput = document.getElementById('recallInput');
+    const recallHint = document.getElementById('recallHint');
+    const roundEl = document.getElementById('round');
+    const correctEl = document.getElementById('correct');
+    const difficultyEl = document.getElementById('difficulty');
+    const progressEl = document.getElementById('progressFill');
+    
+    function getWord() {
+        // Difficulty increases each round
+        let words, diff;
+        if (round < 3) {
+            words = easyWords;
+            diff = 'easy';
+        } else if (round < 6) {
+            words = medWords;
+            diff = 'medium';
+        } else {
+            words = hardWords;
+            diff = 'hard';
+        }
+        difficultyEl.textContent = diff;
+        return words[Math.floor(Math.random() * words.length)];
+    }
+    
+    function getFlashTime() {
+        // Flash time decreases each round (2000ms down to 800ms)
+        return Math.max(800, 2000 - (round * 120));
+    }
+    
+    function startRound() {
+        if (round >= TOTAL_ROUNDS) {
+            complete();
+            return;
+        }
+        
+        round++;
+        roundEl.textContent = round;
+        progressEl.style.width = ((round - 1) / TOTAL_ROUNDS * 100) + '%';
+        
+        // Get word for this round
+        currentWord = getWord();
+        
+        // Show the word
+        flashWord.textContent = currentWord;
+        flashBox.classList.add('showing');
+        inputArea.classList.add('hidden');
+        recallInput.value = '';
+        recallHint.textContent = '';
+        
+        // Hide after flash time
+        setTimeout(() => {
+            flashBox.classList.remove('showing');
+            flashWord.textContent = '?';
+            inputArea.classList.remove('hidden');
+            recallInput.focus();
+        }, getFlashTime());
+    }
+    
+    function checkAnswer() {
+        const answer = recallInput.value.trim().toLowerCase();
+        
+        if (answer === currentWord.toLowerCase()) {
+            correctCount++;
+            correctEl.textContent = correctCount;
+            recallHint.textContent = 'correct!';
+            recallHint.className = 'recall-hint correct';
+            
+            setTimeout(startRound, 800);
+        } else if (answer.length >= currentWord.length) {
+            recallHint.textContent = 'wrong - it was: ' + currentWord;
+            recallHint.className = 'recall-hint wrong';
+            
+            setTimeout(startRound, 1500);
+        }
+    }
+    
+    function complete() {
+        flashWord.textContent = 'done!';
+        flashBox.classList.add('showing');
+        inputArea.classList.add('hidden');
+        progressEl.style.width = '100%';
+        
+        setTimeout(() => document.getElementById('completeForm').submit(), 1000);
+    }
+    
+    recallInput.addEventListener('input', checkAnswer);
+    recallInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            checkAnswer();
+        }
+    });
+    
+    // Start after short delay
+    setTimeout(startRound, 1500);
+})();
+</script>
+{% endblock %}

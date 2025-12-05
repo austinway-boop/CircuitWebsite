@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuit - Social-Based Matchmaking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='circuitweb/styles/styles.css') }}">
+    <link href="https://api.fontshare.com/v2/css?f[]=sohne@300,400,500,600,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Canvas Background -->
+    <canvas id="gradientCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; pointer-events: none;"></canvas>
+    
+    <div class="container">
+        <!-- Header Navigation -->
+        <header class="header">
+            <div class="nav-container nav-centered">
+                <nav class="nav-menu">
+                    <a href="{{ url_for('circuit_about') }}" class="nav-item"><span>About</span></a>
+                    <a href="{{ url_for('circuit_how_it_works') }}" class="nav-item"><span>How it Works</span></a>
+                    <a href="{{ url_for('circuit_research') }}" class="nav-item"><span>Research</span></a>
+                    <a href="{{ url_for('circuit_contact') }}" class="nav-item"><span>Contact</span></a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1 class="hero-title" id="main-title">
+                    Social-Based Matchmaking for Video Games
+                </h1>
+                <p class="hero-subtitle" id="main-subtitle">
+                    Replacing skill-based matchmaking with teammates you'll actually get along with. Same lobby, better people.
+                </p>
+
+                <!-- Action Cards -->
+                <div class="action-cards">
+                    <div class="action-card video-card" onclick="document.querySelector('.video-section').scrollIntoView({behavior: 'smooth'});">
+                        <div class="card-icon purple-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                <path d="M10 8l14 8-14 8V8z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">Watch the Story</h3>
+                            <p class="card-description">How we ignored the Rat Park solution and created digital addiction.</p>
+                        </div>
+                        <div class="card-arrow">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="action-card demo-card" onclick="window.location.href='{{ url_for('circuit_demo') }}'">
+                        <div class="card-icon blue-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                <rect x="6" y="8" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M12 14h8M12 18h6" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">Try the Demo</h3>
+                            <p class="card-description">Experience community-based connections, not endless swiping.</p>
+                        </div>
+                        <div class="card-arrow">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Video Section -->
+    <section class="video-section">
+        <div class="container">
+            <div class="video-container" id="videoContainer">
+                <div class="video-placeholder" id="videoPlaceholder">
+                    <div class="play-button">
+                        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                            <circle cx="28" cy="28" r="27" stroke="rgba(255,255,255,0.6)" stroke-width="1" fill="none"/>
+                            <path d="M23 18l16 10-16 10V18z" fill="rgba(255,255,255,0.8)"/>
+                        </svg>
+                    </div>
+                    <div class="video-overlay">
+                        <h3>Gaming's retention problem</h3>
+                        <p>7 min watch</p>
+                    </div>
+                </div>
+                <video id="mainVideo" controls style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 17px;">
+                    <source src="{{ url_for('static', filename='circuitweb/assets/CircuitExplan.mp4') }}" type="video/mp4">
+                </video>
+            </div>
+            <p class="video-note">
+                This video contains AI-generated educational content
+            </p>
+        </div>
+    </section>
+
+    <!-- Preview Section -->
+    <section class="preview-section">
+        <div class="container">
+            <div class="preview-simple">
+                <h2 class="preview-title">Try the demo</h2>
+                <p class="preview-text">
+                    Three short games - reaction time, memory recall, and word association. We're not really measuring how well you play. The games have intentional quirks, and how you respond to them tells us more than your score ever could.
+                </p>
+                <a href="{{ url_for('circuit_demo') }}" class="preview-cta">Play Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Circuit</h4>
+                    <p>Building communities, not addictions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_how_it_works') }}">How it Works</a></li>
+                        <li><a href="{{ url_for('circuit_guidelines') }}">Community Guidelines</a></li>
+                        <li><a href="{{ url_for('circuit_safety') }}">Safety</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_about') }}">About</a></li>
+                        <li><a href="{{ url_for('circuit_research') }}">Research</a></li>
+                        <li><a href="{{ url_for('circuit_careers') }}">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_help') }}">Help Center</a></li>
+                        <li><a href="{{ url_for('circuit_contact') }}">Contact</a></li>
+                        <li><a href="{{ url_for('privacy') }}">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>2024 Circuit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='circuitweb/scripts/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.gradientColors = {
+                center: '#f0fdfa',
+                ring1: '#ccfbf1',
+                ring2: '#99f6e4', 
+                outer: '#5eead4'
+            };
+            window.currentCircleColor = '#ffffff';
+        });
+        
+        document.getElementById('videoPlaceholder').addEventListener('click', function() {
+            this.style.display = 'none';
+            var video = document.getElementById('mainVideo');
+            video.style.display = 'block';
+            video.play();
+        });
+        
+        document.getElementById('mainVideo').addEventListener('ended', function() {
+            this.style.display = 'none';
+            document.getElementById('videoPlaceholder').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>

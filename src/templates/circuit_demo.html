@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuit Demo - Black Magic</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=sohne@300,400,500,600,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            min-height: 100vh;
+            color: #ffffff;
+            font-family: 'Sohne', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            position: relative;
+            letter-spacing: -0.01em;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 1.75rem;
+            left: 1.75rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.25);
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .main-content {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .screen {
+            max-width: 560px;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .intro-text {
+            font-size: 1.4rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .next-button {
+            padding: 0.9rem 2.2rem;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.35);
+            color: #ffffff;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: background 0.14s ease, border-color 0.14s ease;
+            font-weight: 500;
+            font-family: 'Sohne', sans-serif;
+        }
+
+        .next-button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .next-button:active {
+            transform: scale(0.97);
+            transition: transform 0.06s ease;
+        }
+
+        .demo-container {
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .demo-title {
+            font-size: 2.6rem;
+            font-weight: 580;
+            letter-spacing: 0.12em;
+            margin-bottom: 1.25rem;
+            color: #ffffff;
+            line-height: 1;
+            text-align: center;
+            width: 100%;
+            padding-right: 0.12em;
+        }
+
+        .demo-description {
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .demo-button {
+            padding: 0.9rem 2.2rem;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.35);
+            color: #ffffff;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: background 0.14s ease, border-color 0.14s ease;
+            font-weight: 500;
+            font-family: 'Sohne', sans-serif;
+        }
+
+        .demo-button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .demo-button:active {
+            transform: scale(0.97);
+            transition: transform 0.06s ease;
+        }
+
+        @media (max-width: 768px) {
+            .back-button {
+                top: 1.25rem;
+                left: 1.25rem;
+                font-size: 0.78rem;
+                padding: 0.45rem 0.9rem;
+            }
+
+            .demo-title {
+                font-size: 2.2rem;
+            }
+
+            .intro-text {
+                font-size: 1.15rem;
+            }
+
+            .demo-description {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <a href="{{ url_for('circuit_index') }}" class="back-button">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Back
+    </a>
+
+    <div class="main-content">
+        <!-- Step 1: Introduction -->
+        <div class="screen active" id="step1">
+            <p class="intro-text">This is a demonstration of behavioral-based inferencing.</p>
+            <button class="next-button" onclick="nextStep(2)">Next</button>
+        </div>
+
+        <!-- Step 2: Warning -->
+        <div class="screen" id="step2">
+            <p class="intro-text">Using minimal data points, we'll predict which college you attend.</p>
+            <button class="next-button" onclick="nextStep(3)">Continue</button>
+        </div>
+
+        <!-- Step 3: Main Demo -->
+        <div class="screen" id="step3">
+            <div class="demo-container">
+                <h1 class="demo-title">BLACK MAGIC</h1>
+                <p class="demo-description">
+                    How much can we learn about you from almost nothing?
+                </p>
+                
+                <button class="demo-button" onclick="startDemo()">Begin Analysis</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const mouse = {
+            x: null,
+            y: null,
+            radius: 200
+        };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        class Particle {
+            constructor(x, y, color, size) {
+                this.x = x;
+                this.y = y;
+                this.baseX = x;
+                this.baseY = y;
+                this.color = color;
+                this.size = size;
+                this.density = (Math.random() * 1.5) + 0.8;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+
+            update() {
+                if (!mouse.x || !mouse.y) return;
+                
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < mouse.radius) {
+                    let forceDirectionX = dx / distance;
+                    let forceDirectionY = dy / distance;
+                    let maxDistance = mouse.radius;
+                    let force = (maxDistance - distance) / maxDistance;
+                    let directionX = forceDirectionX * force * this.density * 3;
+                    let directionY = forceDirectionY * force * this.density * 3;
+                    
+                    this.x -= directionX;
+                    this.y -= directionY;
+                } else {
+                    if (Math.abs(this.x - this.baseX) > 0.1) {
+                        this.x += (this.baseX - this.x) * 0.08;
+                    }
+                    if (Math.abs(this.y - this.baseY) > 0.1) {
+                        this.y += (this.baseY - this.y) * 0.08;
+                    }
+                }
+            }
+        }
+
+        const particlesArray = [];
+        
+        function init() {
+            particlesArray.length = 0;
+            const gridSpacing = 3;
+            
+            for (let y = 0; y < canvas.height; y += gridSpacing) {
+                for (let x = 0; x < canvas.width; x += gridSpacing) {
+                    const offsetX = (Math.random() - 0.5) * 2;
+                    const offsetY = (Math.random() - 0.5) * 2;
+                    
+                    const px = x + offsetX;
+                    const py = y + offsetY;
+                    
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    
+                    const distFromTopLeft = Math.sqrt(Math.pow(px / w, 2) + Math.pow(py / h, 2));
+                    const distFromTopRight = Math.sqrt(Math.pow((w - px) / w, 2) + Math.pow(py / h, 2));
+                    const distFromBottomLeft = Math.sqrt(Math.pow(px / w, 2) + Math.pow((h - py) / h, 2));
+                    const distFromBottomRight = Math.sqrt(Math.pow((w - px) / w, 2) + Math.pow((h - py) / h, 2));
+                    
+                    const cyanInfluence = (1 - distFromTopLeft) * 0.8;
+                    const blueInfluence = (1 - distFromTopRight) * 0.7;
+                    const purpleInfluence = (1 - distFromBottomLeft) * 0.5;
+                    const indigoInfluence = (1 - distFromBottomRight) * 0.6;
+                    
+                    const r = Math.floor(
+                        0 * cyanInfluence + 
+                        59 * blueInfluence + 
+                        99 * purpleInfluence + 
+                        79 * indigoInfluence
+                    );
+                    const g = Math.floor(
+                        180 * cyanInfluence + 
+                        130 * blueInfluence + 
+                        102 * purpleInfluence + 
+                        70 * indigoInfluence
+                    );
+                    const b = Math.floor(
+                        220 * cyanInfluence + 
+                        246 * blueInfluence + 
+                        241 * purpleInfluence + 
+                        229 * indigoInfluence
+                    );
+                    
+                    const randomOpacity = 0.5 + Math.random() * 0.5;
+                    const color = `rgba(${r}, ${g}, ${b}, ${randomOpacity})`;
+                    
+                    const size = Math.random() < 0.8 ? 1 : 1.5;
+                    
+                    particlesArray.push(new Particle(px, py, color, size));
+                }
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            init();
+        });
+
+        function nextStep(stepNumber) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            setTimeout(() => {
+                document.getElementById('step' + stepNumber).classList.add('active');
+            }, 100);
+        }
+
+        function startDemo() {
+            // Redirect to BlackmagicDemo signup flow
+            window.location.href = '{{ url_for("signup") }}';
+        }
+    </script>
+</body>
+</html>
+

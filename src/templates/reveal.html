@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}black magic - results{% endblock %}
+
+{% block content %}
+<div class="reveal-wrapper">
+    <div class="reveal-header fade-in">
+        <h1>{{ user_name }}</h1>
+        <p class="reveal-intro">Based on your interactions, we've made a prediction:</p>
+    </div>
+
+    <div class="predictions fade-in-delay">
+        {% if prediction.college and prediction.found %}
+        <div class="prediction-card main-prediction">
+            <p class="card-label">we think you may have attended</p>
+            <p class="card-value">{{ prediction.college }}</p>
+            <p class="card-confidence">{{ prediction.confidence }}% confidence</p>
+        </div>
+        {% else %}
+        <div class="prediction-card main-prediction no-college">
+            <p class="card-label">education</p>
+            <p class="card-value">we couldn't determine your college</p>
+            <p class="card-note">Based on your information, we weren't able to make a confident prediction about your educational background.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="feedback-section fade-in-delay">
+        <p class="feedback-question">were we right?</p>
+        
+        <div class="button-group" id="feedbackButtons">
+            <button class="btn" onclick="showSuccess()">yes</button>
+            <button class="btn btn-outline" onclick="showFeedback()">no</button>
+        </div>
+
+        <div id="feedbackForm" class="hidden mt-3">
+            <form method="POST" action="{{ url_for('submit_feedback') }}">
+                <div class="form-group">
+                    <label>what's the correct answer?</label>
+                    <input type="text" name="correct_value" required maxlength="200" placeholder="Your answer">
+                </div>
+                <button type="submit" class="btn btn-full">submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="successOverlay" class="success-overlay hidden">
+    <div id="boxContainer"></div>
+    <div class="success-content">
+        <h2>thank you</h2>
+        <p class="demo-message">
+            This was a demo, so we may have gotten it wrong. But if you're interested in seeing how we use the Circuit algorithm to identify behavioral patterns from player data in video games, we'd love to hear from you.
+        </p>
+        <a href="mailto:contact@circuit.com" class="btn contact-btn">get in touch</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showSuccess() {
+    document.querySelector('.reveal-wrapper').classList.add('hidden');
+    const overlay = document.getElementById('successOverlay');
+    overlay.classList.remove('hidden');
+    initBoxPhysics();
+    
+    setTimeout(() => {
+        document.querySelector('.success-content').classList.add('visible');
+    }, 1500);
+}
+
+function showFeedback() {
+    document.getElementById('feedbackButtons').classList.add('hidden');
+    document.getElementById('feedbackForm').classList.remove('hidden');
+}
+
+function initBoxPhysics() {
+    const container = document.getElementById('boxContainer');
+    const boxes = [];
+    const numBoxes = 60;
+    const gravity = 0.4;
+    const bounce = 0.6;
+    const friction = 0.99;
+    const groundY = window.innerHeight - 20;
+    
+    // Create boxes
+    for (let i = 0; i < numBoxes; i++) {
+        const size = Math.random() * 30 + 15;
+        const box = document.createElement('div');
+        box.className = 'physics-box';
+        box.style.width = size + 'px';
+        box.style.height = size + 'px';
+        container.appendChild(box);
+        
+        boxes.push({
+            el: box,
+            x: Math.random() * (window.innerWidth - size),
+            y: -size - Math.random() * 800,
+            vx: (Math.random() - 0.5) * 4,
+            vy: Math.random() * 2,
+            size: size,
+            rotation: Math.random() * 360,
+            rotationSpeed: (Math.random() - 0.5) * 8,
+            isDragging: false
+        });
+        
+        // Drag functionality
+        box.addEventListener('mousedown', (e) => startDrag(e, boxes[i]));
+        box.addEventListener('touchstart', (e) => startDrag(e, boxes[i]));
+    }
+    
+    let draggedBox = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    
+    function startDrag(e, box) {
+        e.preventDefault();
+        draggedBox = box;
+        box.isDragging = true;
+        box.el.style.zIndex = 100;
+        
+        const pos = e.touches ? e.touches[0] : e;
+        dragOffsetX = pos.clientX - box.x;
+        dragOffsetY = pos.clientY - box.y;
+        lastMouseX = pos.clientX;
+        lastMouseY = pos.clientY;
+    }
+    
+    function onMove(e) {
+        if (!draggedBox) return;
+        const pos = e.touches ? e.touches[0] : e;
+        
+        draggedBox.vx = (pos.clientX - lastMouseX) * 0.5;
+        draggedBox.vy = (pos.clientY - lastMouseY) * 0.5;
+        
+        draggedBox.x = pos.clientX - dragOffsetX;
+        draggedBox.y = pos.clientY - dragOffsetY;
+        
+        lastMouseX = pos.clientX;
+        lastMouseY = pos.clientY;
+    }
+    
+    function onUp() {
+        if (draggedBox) {
+            draggedBox.isDragging = false;
+            draggedBox.el.style.zIndex = 1;
+            draggedBox = null;
+        }
+    }
+    
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove);
+    document.addEventListener('touchend', onUp);
+    
+    function update() {
+        boxes.forEach(box => {
+            if (box.isDragging) {
+                box.el.style.transform = `translate(${box.x}px, ${box.y}px) rotate(${box.rotation}deg)`;
+                return;
+            }
+            
+            // Apply gravity
+            box.vy += gravity;
+            
+            // Apply friction
+            box.vx *= friction;
+            
+            // Update position
+            box.x += box.vx;
+            box.y += box.vy;
+            box.rotation += box.rotationSpeed;
+            
+            // Ground collision
+            if (box.y + box.size > groundY) {
+                box.y = groundY - box.size;
+                box.vy *= -bounce;
+                box.rotationSpeed *= 0.8;
+                
+                // Stop tiny bounces
+                if (Math.abs(box.vy) < 1) {
+                    box.vy = 0;
+                    box.rotationSpeed *= 0.9;
+                }
+            }
+            
+            // Wall collisions
+            if (box.x < 0) {
+                box.x = 0;
+                box.vx *= -bounce;
+            }
+            if (box.x + box.size > window.innerWidth) {
+                box.x = window.innerWidth - box.size;
+                box.vx *= -bounce;
+            }
+            
+            box.el.style.transform = `translate(${box.x}px, ${box.y}px) rotate(${box.rotation}deg)`;
+        });
+        
+        requestAnimationFrame(update);
+    }
+    
+    update();
+}
+</script>
+{% endblock %}

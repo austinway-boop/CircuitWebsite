@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research - Circuit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='circuitweb/styles/styles.css') }}">
+    <link href="https://api.fontshare.com/v2/css?f[]=sohne@300,400,500,600,700&display=swap" rel="stylesheet">
+</head>
+<body class="secondary-page">
+    <canvas id="gradientCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; pointer-events: none;"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="{{ url_for('circuit_index') }}" style="text-decoration: none; color: inherit;">Circuit</a>
+                </div>
+                <nav class="nav-menu">
+                    <a href="{{ url_for('circuit_how_it_works') }}" class="nav-item"><span>How it Works</span></a>
+                    <a href="{{ url_for('circuit_about') }}" class="nav-item"><span>About</span></a>
+                    <a href="{{ url_for('circuit_research') }}" class="nav-item"><span>Research</span></a>
+                    <a href="{{ url_for('circuit_contact') }}" class="nav-item"><span>Contact</span></a>
+                </nav>
+                <div class="nav-actions">
+                    <a href="{{ url_for('circuit_demo') }}" class="contact-btn">Try Demo</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="secondary-hero">
+            <div class="hero-divider"></div>
+            <h1>The Science Behind Circuit</h1>
+            <p>Our approach is rooted in decades of behavioral psychology research on addiction, connection, and well-being.</p>
+        </main>
+    </div>
+
+    <div class="content-section">
+        <div class="container">
+            <div class="page-card">
+                <h2>The Rat Park Experiment</h2>
+                <p style="margin-bottom: 16px;">In 1978, psychologist Bruce Alexander conducted a groundbreaking experiment that challenged everything we thought we knew about addiction.</p>
+                
+                <p style="margin-bottom: 16px;">Previous studies had shown that isolated rats would compulsively consume morphine-laced water until they died. But Alexander asked: what if the problem wasn't the drug - what if it was the isolation?</p>
+                
+                <p style="margin-bottom: 0;">He created "Rat Park" - a spacious, enriched environment where rats could socialize, play, and mate. The results were stunning: rats in Rat Park showed almost no interest in the drugged water.</p>
+            </div>
+
+            <div class="page-card">
+                <h2>The Digital Cage</h2>
+                <p style="margin-bottom: 20px;">Today's social media platforms have become the opposite of Rat Park:</p>
+                
+                <ul class="info-list">
+                    <li><strong>Shallow connections:</strong> Likes and comments trigger dopamine but don't satisfy our need for genuine bonding</li>
+                    <li><strong>Social comparison:</strong> Curated feeds create anxiety and inadequacy, not belonging</li>
+                    <li><strong>Variable rewards:</strong> Infinite scroll mimics slot machine psychology</li>
+                    <li><strong>Attention extraction:</strong> Every feature maximizes time-on-app, not well-being</li>
+                </ul>
+            </div>
+
+            <div class="page-card">
+                <h2>Key Studies</h2>
+                
+                <div class="study-card">
+                    <h4>Alexander, B.K. et al. (1978)</h4>
+                    <p>"Effect of early and later colony housing on oral ingestion of morphine in rats" - The original Rat Park study.</p>
+                </div>
+                
+                <div class="study-card">
+                    <h4>Twenge, J.M. (2017)</h4>
+                    <p>"iGen" - Longitudinal research on smartphone effects on youth mental health.</p>
+                </div>
+                
+                <div class="study-card">
+                    <h4>Alter, A. (2017)</h4>
+                    <p>"Irresistible" - Analysis of persuasive design techniques used by tech companies.</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="{{ url_for('circuit_about') }}" class="btn-secondary">Learn About Our Mission</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Circuit</h4>
+                    <p>Building communities, not addictions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_how_it_works') }}">How it Works</a></li>
+                        <li><a href="{{ url_for('circuit_guidelines') }}">Community Guidelines</a></li>
+                        <li><a href="{{ url_for('circuit_safety') }}">Safety</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_about') }}">About</a></li>
+                        <li><a href="{{ url_for('circuit_research') }}">Research</a></li>
+                        <li><a href="{{ url_for('circuit_careers') }}">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="{{ url_for('circuit_help') }}">Help Center</a></li>
+                        <li><a href="{{ url_for('circuit_contact') }}">Contact</a></li>
+                        <li><a href="{{ url_for('privacy') }}">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>2024 Circuit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='circuitweb/scripts/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.gradientColors = {
+                center: '#f0fdfa',
+                ring1: '#ccfbf1',
+                ring2: '#99f6e4', 
+                outer: '#5eead4'
+            };
+            window.currentCircleColor = '#ffffff';
+        });
+    </script>
+</body>
+</html>
