@@ -26,35 +26,61 @@ class ClaudeSearcher:
         
         current_year = datetime.now().year
         grad_year = (current_year - age + 22) if age else None
+        grad_year_range = f"{grad_year-2} to {grad_year+2}" if grad_year else "unknown"
         
-        prompt = f"""Search the web for information about this person and find their educational background:
+        # Expand location to broader area
+        location_hints = ""
+        if location:
+            location_hints = f"""
+Location given: {location}
+NOTE: Location may be approximate. If they said "{location}", also search nearby cities, suburbs, 
+and the broader metropolitan area. For example:
+- "Austin" could mean Round Rock, Cedar Park, Pflugerville, or anywhere in Central Texas
+- "San Francisco" could mean Bay Area, Oakland, San Jose, etc.
+- Any city could mean surrounding suburbs or the metro area"""
+        
+        prompt = f"""You are a research assistant. Search the web THOROUGHLY to find information about this person.
 
-Name: {name}
-Age: {age}
-Location: {location}
-Likely college graduation year: ~{grad_year}
+PERSON TO FIND:
+- Full Name: {name}
+- Age: {age} years old
+- Approximate graduation year: {grad_year_range}
+{location_hints}
 
-Search for "{name}" on LinkedIn, university records, or any public profiles to find:
-1. What college/university did they attend?
-2. What degree did they earn?
-3. What is their current job/career?
+SEARCH STRATEGY (do ALL of these):
+1. Search LinkedIn: "{name}" LinkedIn profile
+2. Search with location: "{name}" {location if location else ''} university OR college
+3. Search graduation records: "{name}" graduated {grad_year if grad_year else ''} university
+4. Search social media: "{name}" education background
+5. Try name variations (first name only, with middle initial, etc.)
 
-After searching, respond with ONLY this JSON format:
+WHAT TO FIND:
+- College/University attended (MOST IMPORTANT)
+- Degree earned
+- Field of study
+- Current career/job
+
+After your thorough search, you MUST respond with this JSON:
 {{
-  "college": "The actual university name found, or null if not found",
-  "degree": "Degree type if found (BS, BA, MS, etc), or null",
-  "field": "Field of study if found, or null",
-  "career": "Current job/career if found, or null",
-  "personality": "One word trait based on their profile, or null",
-  "confidence": 85,
-  "source": "URL where you found the info, or null"
+  "college": "University name - YOUR BEST GUESS based on all evidence, even if uncertain",
+  "degree": "Degree type or your best guess",
+  "field": "Field of study or your best guess",
+  "career": "Current career or your best guess",
+  "personality": "One personality trait that fits their profile",
+  "confidence": 75,
+  "source": "URL or 'inference from search results'",
+  "reasoning": "Brief explanation of how you determined this"
 }}
 
-IMPORTANT:
-- Only report information you actually found from web search
-- Do NOT guess or make up information
-- Return null for fields you couldn't find
-- Set confidence to 0 if you found nothing about this person"""
+CRITICAL RULES:
+1. You MUST provide a college prediction - make your BEST EDUCATED GUESS based on:
+   - Their location (nearby universities)
+   - Their age (graduation timeline)
+   - Any partial info found
+   - Common universities in their area
+2. If you found NOTHING, still guess based on location/age demographics
+3. Set confidence 10-30 for guesses, 40-70 for partial info, 80+ for confirmed finds
+4. NEVER return null for college - always make a prediction"""
 
         try:
             logger.info("Calling Claude API with web search...")
@@ -63,15 +89,15 @@ IMPORTANT:
                 headers=self.headers,
                 json={
                     'model': CLAUDE_MODEL,
-                    'max_tokens': 2048,
+                    'max_tokens': 4096,
                     'messages': [{'role': 'user', 'content': prompt}],
                     'tools': [{
                         'type': 'web_search_20250305',
                         'name': 'web_search',
-                        'max_uses': 5
+                        'max_uses': 10
                     }]
                 },
-                timeout=60
+                timeout=90
             )
             
             logger.info(f"Claude API Status: {response.status_code}")
@@ -134,38 +160,97 @@ IMPORTANT:
                 data = json.loads(cleaned)
             
             college = data.get('college')
-            if college and str(college).lower() in ['null', 'none', 'unknown', '', 'n/a']:
+            # Only reject truly empty values - keep guesses
+            if college and str(college).lower() in ['null', 'none', '', 'n/a']:
                 college = None
+            
+            # If AI responded but gave no college, make inference from location
+            if not college and location:
+                college = self._infer_college_from_location(location)
+                data['confidence'] = 15  # Low confidence for pure inference
             
             source_url = data.get('source') or (sources[0] if sources else None)
             
             return {
                 'found': bool(college),
-                'college': college,
-                'degree': data.get('degree'),
-                'field': data.get('field'),
-                'career': data.get('career'),
-                'personality': data.get('personality'),
-                'confidence': int(data.get('confidence', 0)) if college else 0,
+                'college': college or "Unable to determine",
+                'degree': data.get('degree') or "Unknown",
+                'field': data.get('field') or "Unknown",
+                'career': data.get('career') or "Unknown",
+                'personality': data.get('personality') or "Unknown",
+                'confidence': int(data.get('confidence', 20)),
                 'source': source_url,
+                'reasoning': data.get('reasoning', ''),
                 'raw_response': text
             }
             
         except Exception as e:
             logger.error(f"JSON parse error: {e}")
             logger.error(f"Text was: {cleaned[:300]}")
+            # Still try to make a prediction from location if AI responded
+            if location:
+                return self._location_based_prediction(name, age, location, text)
             return self._fallback_result(name, age, location)
     
+    def _infer_college_from_location(self, location: str) -> Optional[str]:
+        """Infer most likely college based on location."""
+        location_lower = location.lower()
+        
+        # Major city -> nearby flagship university mapping
+        location_map = {
+            'austin': 'University of Texas at Austin',
+            'houston': 'University of Houston',
+            'dallas': 'Southern Methodist University',
+            'san antonio': 'University of Texas at San Antonio',
+            'los angeles': 'UCLA',
+            'san francisco': 'UC Berkeley',
+            'new york': 'NYU',
+            'boston': 'Boston University',
+            'chicago': 'University of Chicago',
+            'seattle': 'University of Washington',
+            'denver': 'University of Colorado',
+            'atlanta': 'Georgia Tech',
+            'miami': 'University of Miami',
+            'phoenix': 'Arizona State University',
+            'portland': 'Portland State University',
+            'san diego': 'UC San Diego',
+        }
+        
+        for city, university in location_map.items():
+            if city in location_lower:
+                return university
+        
+        return None
+    
+    def _location_based_prediction(self, name: str, age: Optional[int], location: str, raw_text: str) -> Dict[str, Any]:
+        """Make prediction based on location when JSON parsing fails but AI responded."""
+        college = self._infer_college_from_location(location) or f"Local university near {location}"
+        
+        return {
+            'found': True,
+            'college': college,
+            'degree': "Bachelor's degree",
+            'field': "Unknown",
+            'career': "Unknown",
+            'personality': "Unknown",
+            'confidence': 10,
+            'source': 'inference from location',
+            'reasoning': f'Based on location: {location}',
+            'raw_response': raw_text
+        }
+    
     def _fallback_result(self, name: str, age: Optional[int], location: Optional[str]) -> Dict[str, Any]:
+        """Only used when API completely fails - returns error state."""
         return {
             'found': False,
-            'college': None,
+            'college': 'API Error - Could not process request',
             'degree': None,
             'field': None,
             'career': None,
             'personality': None,
             'confidence': 0,
             'source': None,
+            'error': 'API request failed',
             'raw_response': None
         }
 
